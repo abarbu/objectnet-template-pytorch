@@ -28,13 +28,13 @@ parser.add_argument('model_class_name', metavar='model-class-name',
                     help='model class name in model_description.py')
 parser.add_argument('model_checkpoint', metavar='model-checkpoint',
                     help='path to model checkpoint')
-parser.add_argument('-j', '--workers', default=multiprocessing.cpu_count(), type=int, metavar='N',
+parser.add_argument('--workers', default=multiprocessing.cpu_count(), type=int, metavar='N',
                     help='number of data loading workers (default: total num CPUs)')
 parser.add_argument('--gpus', default=torch.cuda.device_count(), type=int,
                     help='number of GPUs to use')
-parser.add_argument('-b', '--batch_size', default=96, type=int,
+parser.add_argument('--batch_size', default=96, type=int,
                     metavar='N',
-                    help='mini-batch size (default: 256), this is the '
+                    help='mini-batch size (default: 96), this is the '
                          'batch size of each GPU on the current node when '
                          'using Data Parallel or Distributed Data Parallel')
 
