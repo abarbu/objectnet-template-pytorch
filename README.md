@@ -10,10 +10,12 @@ pytorch 1.4\
 cuda 10.1
 
 # Instructions to run objectnet_eval.py
-cd model\
-wget https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth \
-cd ../ \
+```
+cd model
+wget https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth
+cd ../
 python objectnet_eval.py images_folder out.csv resnext101_32x48d_wsl model/ig_resnext101_32x48-3e41cc8a.pth
+```
 
 # objectnet_eval.py --help
 ```
