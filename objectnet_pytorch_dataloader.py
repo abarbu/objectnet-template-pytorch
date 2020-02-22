@@ -19,10 +19,6 @@ class ObjectNetDataset(VisionDataset):
     def __init__(self, root, transform=None, target_transform=None, transforms=None, img_format="jpg"):
         """Init ObjectNet pytorch dataloader."""
         super(ObjectNetDataset, self).__init__(root, transforms, transform, target_transform)
-        #from objectnet_competition_api import ObjectNet
-
-        #self.objectnet = ObjectNet(root)
-        #self.ids = list(sorted(self.objectnet.imgs.keys()))
 
         self.loader = self.pil_loader
         self.img_format = img_format
@@ -39,7 +35,7 @@ class ObjectNetDataset(VisionDataset):
         Args:
             index (int): Index
         Returns:
-            tuple: Tuple (image, target). target is the object returned by 'objectnet.loadAnns'.
+            tuple: Tuple (image, target). target is the image file name
         """
         img, target = self.getImage(index)
         if self.transforms is not None:
@@ -54,7 +50,7 @@ class ObjectNetDataset(VisionDataset):
         Args:
             index (int): Index
         Return:
-            tuple: Tuple (image, target). target is the object returned by 'objectnet.loadAnns'.
+            tuple: Tuple (image, target). target is the image file name
         """
         img = self.loader(self.pathDict[self.imgs[index]])
 
