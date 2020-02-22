@@ -60,6 +60,8 @@ batches_per_device = args.batch_size #upper bound estimate of how much data will
 batch_size = (batches_per_device*len(all_parallel_devices))
 num_workers = args.workers
 
+img_format = "jpg"
+
 def load_pretrained_net():
     print("initializing model ...")
     model = getattr(model_description, MODEL_CLASS_NAME)()
@@ -86,7 +88,7 @@ def evalModels():
 
     net = load_pretrained_net()
 
-    objectnet = ObjectNet(OBJECTNET_IMAGES_FOLDER,transform=net['transform'], img_format="png")
+    objectnet = ObjectNet(OBJECTNET_IMAGES_FOLDER,transform=net['transform'], img_format=img_format)
     dataloader = DataLoader(objectnet, batch_size=(batches_per_device*len(all_parallel_devices)), num_workers=num_workers*2, pin_memory=True)
 
     predictions=[]
