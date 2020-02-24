@@ -1,7 +1,3 @@
-TensorFlow[![Build Status](https://travis-ci.com/IBM/MAX-ResNet-50.svg?branch=master)](https://travis-ci.com/IBM/MAX-ResNet-50) [![Website Status](https://img.shields.io/website/http/max-resnet-50.max.us-south.containers.appdomain.cloud/swagger.json.svg?label=api+demo)](http://max-resnet-50.max.us-south.containers.appdomain.cloud/)
-
-[<img src="docs/deploy-max-to-ibm-cloud-with-kubernetes-button.png" width="400px">](http://ibm.biz/max-to-ibm-cloud-tutorial)
-
 
 This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the ObjectNet Challenge (**#####SH Proper name for challenge and link to synapse wiki**). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
