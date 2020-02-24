@@ -30,15 +30,43 @@ parser.add_argument('model_checkpoint', metavar='model-checkpoint',
                     help='path to model checkpoint')
 parser.add_argument('--workers', default=multiprocessing.cpu_count(), type=int, metavar='N',
                     help='number of data loading workers (default: total num CPUs)')
-parser.add_argument('--gpus', default=torch.cuda.device_count(), type=int,
+parser.add_argument('--gpus', default=torch.cuda.device_count(), type=int, metavar='N',
                     help='number of GPUs to use')
-parser.add_argument('--batch_size', default=96, type=int,
-                    metavar='N',
+parser.add_argument('--batch_size', default=96, type=int, metavar='N',
                     help='mini-batch size (default: 96), this is the '
                          'batch size of each GPU on the current node when '
                          'using Data Parallel or Distributed Data Parallel')
-
+parser.add_argument('--softmax', default=True, type=bool, metavar='T/F',
+                    help="apply a softmax function to network outputs to convert output magnitudes to confidence values (default:True)")
+parser.add_argument('--convert_outputs_mode', default=1, type=int, metavar='N',
+                    help="0: no conversion of prediction IDs, 1: convert from pytorch ImageNet prediction IDs to ObjectNet prediction IDs (default:1)")
 args = parser.parse_args()
+
+# check the Args
+# images
+assert (os.path.exists(args.images)), "Path to images folder: "+args.images+", does not exist!"
+# output file
+assert (not os.path.exists(args.output_file)), "Output file: "+args.output_file+", already exists!"
+assert (os.path.exists(os.path.dirname(args.output_file)) or os.path.dirname(args.output_file)==""), "Output file path: "+os.path.dirname(args.output_file)+", does not exist!"
+# model class name
+try:
+    getattr(model_description, args.model_class_name)
+except AttributeError as e:
+    print("Module: " + args.model_class_name + ", can not be found in model_description.py!")
+    raise
+# model check point file
+assert (os.path.exists(args.model_checkpoint)), "Model checkpoint file: "+args.model_checkpoint+", does not exist!"
+# workers
+assert (args.workers <= multiprocessing.cpu_count()), "Number of workers: "+args.workers + ", should be <= the number of CPUs " + multiprocessing.cpu_count()+"!"
+assert (args.workers >= 1), "Number of workers must be >= 1!"
+# GPUs
+assert (torch.cuda.is_available()), "No GPUs detected!"
+assert (args.gpus <= torch.cuda.device_count()), "Requested "+args.gpus+" ,but only "+torch.cuda.device_count()+" are availible!"
+assert (args.gpus >= 1), "You have to use at least 1 GPU!"
+# batch batch_size
+assert (args.batch_size >= 1), "Batch size must be >= 1!"
+#convert outputs
+assert (args.convert_outputs_mode in (0,1)), "Convert outputs mode must be either 0 or 1!"
 
 #input images path
 print()
@@ -53,7 +81,7 @@ MODEL_CLASS_NAME = args.model_class_name
 
 # model is copied to all parallel devies and each device evaluates a portion of a batch
 all_parallel_devices = [i for i in range(args.gpus)] #list of GPU IDs to use for model evaluation
-device = torch.device("cuda:"+str(all_parallel_devices[0]) if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:"+str(all_parallel_devices[0]))
 batches_per_device = args.batch_size #upper bound estimate of how much data will fit in GPU memory, tune this based ou GPU memory availible
 
 
@@ -98,7 +126,10 @@ def evalModels():
             model.eval()
             model.to(device)
             inputs.to(device)
-            sm = torch.nn.Softmax(dim=1)
+            if args.softmax:
+                sm = torch.nn.Softmax(dim=1)
+            else:
+                sm = lambda *args: args
             prediction_confidence, prediction_class = sm(model(inputs)).topk(5, 1)
 
         prediction_class = prediction_class.data.cpu().tolist()
@@ -106,6 +137,10 @@ def evalModels():
         for i in range(len(fileName)):
             predictions.append([fileName[i]] + prediction_class[i] + prediction_confidence[i])
     return predictions
+
+
+#def pytorchImageNetIDToObjectNetID():
+
 
 objectnet_predictions = evalModels()
 with open(args.output_file, 'w') as csvOut:
