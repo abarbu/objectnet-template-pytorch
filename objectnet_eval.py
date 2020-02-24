@@ -68,7 +68,7 @@ def load_pretrained_net():
 
     print("loading pretrained weights from disk ...")
     dirname = os.path.dirname(__file__)
-    checkpoint = os.path.join(dirname, "model/ig_resnext101_32x48-3e41cc8a.pth")
+    checkpoint = os.path.join(dirname, args.model_checkpoint)
     state_dict = torch.load(checkpoint)
     model.load_state_dict(state_dict)
 

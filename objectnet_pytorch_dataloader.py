@@ -22,7 +22,7 @@ class ObjectNetDataset(VisionDataset):
 
         self.loader = self.pil_loader
         self.img_format = img_format
-        files = glob.glob(root+"/**/*."+img_format)
+        files = glob.glob(root+"/**/*."+img_format, recursive=True)
         self.pathDict = {}
         for f in files:
             self.pathDict[f.split("/")[-1]] = f
