@@ -19,7 +19,8 @@ python objectnet_eval.py images_folder out.csv resnext101_32x48d_wsl model/ig_re
 
 # objectnet_eval.py --help
 ```
-usage: objectnet_eval.py [-h] [--workers N] [--gpus GPUS] [--batch_size N]
+usage: objectnet_eval.py [-h] [--workers N] [--gpus N] [--batch_size N]
+                         [--softmax T/F] [--convert_outputs_mode N]
                          images-dir output-file model-class-name
                          model-checkpoint
 
@@ -27,18 +28,25 @@ Evaluate a PyTorch model on ObjectNet images and output predictions to a CSV
 file.
 
 positional arguments:
-  images-dir        path to dataset
-  output-file       path to predictions output file
-  model-class-name  model class name in model_description.py
-  model-checkpoint  path to model checkpoint
+  images-dir            path to dataset
+  output-file           path to predictions output file
+  model-class-name      model class name in model_description.py
+  model-checkpoint      path to model checkpoint
 
 optional arguments:
-  -h, --help        show this help message and exit
-  --workers N       number of data loading workers (default: total num CPUs)
-  --gpus GPUS       number of GPUs to use
-  --batch_size N    mini-batch size (default: 256), this is the batch size of
-                    each GPU on the current node when using Data Parallel or
-                    Distributed Data Parallel
+  -h, --help            show this help message and exit
+  --workers N           number of data loading workers (default: total num
+                        CPUs)
+  --gpus N              number of GPUs to use
+  --batch_size N        mini-batch size (default: 96), this is the batch size
+                        of each GPU on the current node when using Data
+                        Parallel or Distributed Data Parallel
+  --softmax T/F         apply a softmax function to network outputs to convert
+                        output magnitudes to confidence values (default:True)
+  --convert_outputs_mode N
+                        0: no conversion of prediction IDs, 1: convert from
+                        pytorch ImageNet prediction IDs to ObjectNet
+                        prediction IDs (default:1)
 ```
 
 # Code structure
