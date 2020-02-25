@@ -50,4 +50,4 @@ WORKDIR /workspace
 COPY . /workspace
 
 # Define the command to execute when the container is run
-ENTRYPOINT python objectnet_eval.py /input /output/out.csv $MODEL_CLASS_NAME $MODEL_PATH 
+ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH 

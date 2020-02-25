@@ -120,7 +120,7 @@ def evalModels():
     dataloader = DataLoader(objectnet, batch_size=(batches_per_device*len(all_parallel_devices)), num_workers=num_workers*2, pin_memory=True)
 
     predictions=[]
-    for inputs, fileName in tqdm(dataloader, desc="Evaluating "+MODEL_CLASS_NAME+" ..."):
+    for inputs, fileName in tqdm(dataloader, desc="Evaluating "+MODEL_CLASS_NAME+" ...", disable=True):
         with torch.no_grad():
             model=nn.DataParallel(net['model'], device_ids=all_parallel_devices)
             model.eval()
@@ -147,3 +147,4 @@ with open(args.output_file, 'w') as csvOut:
     csvwriter = csv.writer(csvOut, delimiter=',')
     for predictImg in objectnet_predictions:
         csvwriter.writerow(predictImg)
+print("Done. Number of predictions: ", len(objectnet_predictions))

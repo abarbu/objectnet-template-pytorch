@@ -196,6 +196,12 @@ You can further customise the build of you docker container by specifying the fo
 
 **#####SH we probably don't want to publicise workers & batch size since this could in theory lead to a DoS attack**
 
+**Note:** The ObjectNet Challenge submission process is expecting the output to be directed to `\output\predictions.csv` file within the container image. Ensure the `output-file` argument to the `objectnet_eval.py` module of the ENTRYPOINT command in the `Dockerfile.pytorch` file is set to `\output\predictions.csv`. For example:
+```
+# Define the command to execute when the container is run
+ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH
+```
+
 To build the docker image run:
 ```bash
 docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/<Your Synapse Project ID>/<Repo name>:<Tag> -f Dockerfile.pytorch .
