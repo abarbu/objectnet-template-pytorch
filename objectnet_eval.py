@@ -143,13 +143,16 @@ def evalModels():
         for i in range(len(fileName)):
             if args.convert_outputs_mode == 1:
                 pytorchImageNetIDToObjectNetID(prediction_class[i])
-            predictions.append([fileName[i]] + prediction_class[i] + prediction_confidence[i])
+            predictions.append([fileName[i]] + [j for i in zip(prediction_class[i],prediction_confidence[i]) for j in i])
     return predictions
 
 
 def pytorchImageNetIDToObjectNetID(prediction_class):
     for i in range(prediction_class):
-        prediction_class[i] = mapping[prediction_class[i]]
+        if prediction_class[i] in mapping:
+            prediction_class[i] = mapping[prediction_class[i]]
+        else:
+            prediction_class[i] = -1
 
 
 objectnet_predictions = evalModels()
