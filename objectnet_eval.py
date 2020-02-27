@@ -9,6 +9,7 @@ import os
 import sys
 import argparse
 import csv
+import json
 
 # import the PyTorch wrapper for ObjectNet
 from objectnet_pytorch_dataloader import ObjectNetDataset as ObjectNet
@@ -90,6 +91,10 @@ num_workers = args.workers
 
 img_format = "jpg"
 
+mapping_file = "mapping_files/imagenet_pytorch_id_to_objectnet_id.json"
+with open(mapping_file,"r") as f:
+    mapping = json.load(f)
+
 def load_pretrained_net():
     print("initializing model ...")
     model = getattr(model_description, MODEL_CLASS_NAME)()
@@ -134,12 +139,17 @@ def evalModels():
 
         prediction_class = prediction_class.data.cpu().tolist()
         prediction_confidence = prediction_confidence.data.cpu().tolist()
+
         for i in range(len(fileName)):
+            if args.convert_outputs_mode == 1:
+                pytorchImageNetIDToObjectNetID(prediction_class[i])
             predictions.append([fileName[i]] + prediction_class[i] + prediction_confidence[i])
     return predictions
 
 
-#def pytorchImageNetIDToObjectNetID():
+def pytorchImageNetIDToObjectNetID(prediction_class):
+    for i in range(prediction_class):
+        prediction_class[i] = mapping[prediction_class[i]]
 
 
 objectnet_predictions = evalModels()
