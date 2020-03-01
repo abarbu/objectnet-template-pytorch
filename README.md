@@ -45,7 +45,7 @@ Instructions on how to install the CUDA toolkit and NVIDIA drivers can be found 
 ## 1.3 Clone this repository
 Clone this repo to a machine which has docker installed:
 ```bash
-$ git clone **#####SH ADD CLONE LINK**
+git clone https://github.com/dmayo/objectnet_competition_demo.git
 ```
 
 ## 1.4 objectnet_eval.py
@@ -240,8 +240,6 @@ If you make changes to your code there is no need to rebuild the docker containe
 docker run -ti --rm -v $PWD:/workspace -v $PWD/sample-images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
 When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
-
-HOW TO TEST IF CHANGES TO DOCKERFILE -ie: rebuild*****
 
 
 ---
