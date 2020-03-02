@@ -167,13 +167,13 @@ Ensure you have been able to successfully test your model on the local host usin
 **Note:** Your model must have been saved using `torch.save(model, "<PATH TO SAVED MODEL FILE>")`.
 
 ## 2.3 Build the docker image
-Docker images are built from a series of statements contained in a `Dockerfile`. A template Dockerfile is provided for models built using the PyTorch (`Dockerfile.pytorch`) deep learning framework and saved using the `torch.save` api.
+Docker images are built from a series of statements contained in a `Dockerfile`. A template Dockerfile is provided for models built using the PyTorch (`Dockerfile`) deep learning framework and saved using the `torch.save` api.
 
 The PyTorch docker image for the ObjectNet Challenge uses the [official PyTorch docker images](https://hub.docker.com/r/pytorch/pytorch/tags) as its base image. These PyTorch images come with built-in GPU support and with python 3 pre-loaded. By default, the docker image is built using [PyTorch version 1.4, cuda 10.1 and cudann7](https://hub.docker.com/layers/pytorch/pytorch/1.4-cuda10.1-cudnn7-runtime/images/sha256-ee783a4c0fccc7317c150450e84579544e171dd01a3f76cf2711262aced85bf7?context=explore).
 
 **#####SH - pointer to a tutorial on how to use the images**
 
- You can customise the PyTorch and cuda versions used for the base image by editing the `Dockerfile.pytorch` file and uncommenting one of the following lines - choose the one which most closely matches the versions used to build your model:
+ You can customise the PyTorch and cuda versions used for the base image by editing the `Dockerfile` file and uncommenting one of the following lines - choose the one which most closely matches the versions used to build your model:
    ```
    # You can select from the following pre-built PyTorch Docker images.
    # Select the image which most closely matches the
@@ -196,7 +196,7 @@ You can further customise the build of you docker container by specifying the fo
 
 **#####SH we probably don't want to publicise workers & batch size since this could in theory lead to a DoS attack**
 
-**Note:** The ObjectNet Challenge submission process is expecting the output to be directed to `\output\predictions.csv` file within the container image. Ensure the `output-file` argument to the `objectnet_eval.py` module of the ENTRYPOINT command in the `Dockerfile.pytorch` file is set to `\output\predictions.csv`. For example:
+**Note:** The ObjectNet Challenge submission process is expecting the output to be directed to `\output\predictions.csv` file within the container image. Ensure the `output-file` argument to the `objectnet_eval.py` module of the ENTRYPOINT command in the `Dockerfile` file is set to `\output\predictions.csv`. For example:
 ```
 # Define the command to execute when the container is run
 ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH
@@ -204,15 +204,15 @@ ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_
 
 To build the docker image run:
 ```bash
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/<Your Synapse Project ID>/<Repo name>:<Tag> -f Dockerfile.pytorch .
+docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/<Your Synapse Project ID>/<Repo name>:<Tag> -f Dockerfile .
 ```
 Replace \<Your Synapse Project ID> with the [ID of the Synapse project](https://docs.synapse.org/articles/getting_started.html#synapse-ids) you have registered with the Challenge.
 For example:
 ```bash
 # With version tagging:
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model:version1 -f Dockerfile.pytorch .
+docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model:version1 -f Dockerfile .
 # Or without version tagging:
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model -f Dockerfile.pytorch .
+docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model -f Dockerfile .
 ```
 Once the build is complete your newly built docker image can be listed using  the command:
 ```bash
