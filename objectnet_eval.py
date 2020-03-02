@@ -89,11 +89,13 @@ batches_per_device = args.batch_size #upper bound estimate of how much data will
 batch_size = (batches_per_device*len(all_parallel_devices))
 num_workers = args.workers
 
-img_format = "jpg"
+img_format = "png"
 
 mapping_file = "mapping_files/imagenet_pytorch_id_to_objectnet_id.json"
 with open(mapping_file,"r") as f:
     mapping = json.load(f)
+    # convert string keys to ints
+    mapping = {int(k): v for k, v in mapping.items()}
 
 def load_pretrained_net():
     print("initializing model ...")
@@ -148,7 +150,7 @@ def evalModels():
 
 
 def pytorchImageNetIDToObjectNetID(prediction_class):
-    for i in range(prediction_class):
+    for i in range(len(prediction_class)):
         if prediction_class[i] in mapping:
             prediction_class[i] = mapping[prediction_class[i]]
         else:
