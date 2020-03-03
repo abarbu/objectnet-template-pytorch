@@ -1,4 +1,4 @@
-
+# Overview
 This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the ObjectNet Challenge (**#####SH Proper name for challenge and link to synapse wiki**). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
 If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided on the ObjectNet Challenge wiki page **#####SH Add link to wiki**
@@ -38,9 +38,9 @@ into the Docker image when the image is built.
 ## 1.2 Install NVIDIA drivers
 If your local machine has NVIDIA-capable GPUs and you want to test your docker image  
 locally using these GPUs then you will need to ensure the NVIDIA drivers have been
-installed on your test machine. See
-.
-Instructions on how to install the CUDA toolkit and NVIDIA drivers can be found [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation). Be sure to match the versions of CUDA/NVIDIA installed with the version of PyTorch and CUDA used to build your docker image (see [Section 2: Building the docker image](Section_2:_Building_the_docker_image)).
+installed on your test machine.
+
+Instructions on how to install the CUDA toolkit and NVIDIA drivers can be found [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation). Be sure to match the versions of CUDA/NVIDIA installed with the version of PyTorch and CUDA used to build your docker image (see [Section 2: Building the docker image](#Section-2:-Building-the-docker-image)).
 
 ## 1.3 Clone this repository
 Clone this repo to a machine which has docker installed:
@@ -123,16 +123,16 @@ argument ('/input' in the example below) to the `objectnet_eval.py` program.
 Then run `objectnet_eval.py` using the following arguments:
 ```bash
 # Perform batch inference:
-python objectnet_eval.py /input out.csv resnext101_32x48d_wsl model/ig_resnext101_32x48-3e41cc8a.pth
+python objectnet_eval.py /input/images /output/predictions.csv resnext101_32x48d_wsl model/ig_resnext101_32x48-3e41cc8a.pth
 ```
-Results will be written to the `out.csv` file in the current directory. Check
+Results will be written to the `predictions.csv` file in the `/output` directory. Check
 the output conforms to the format expected by the ObjectNet Challenge **##### link to
 format description**
 
 ## 1.7 Testing your own model with the example
 To test the example with your own model:
 1. Copy your model checkpoint file into the `./model` directory.
-2. Add your model description as a class to `./mode/model_description.py`. The
+2. Add your model description as a class to `./model/model_description.py`. The
 class name will be used as the `model-class-name` argument to `objectnet_eval.py`.
 For example, for a model which has 32 groups and width per-group of 16 we could add:
 ```python
@@ -143,11 +143,36 @@ class my_model(ResNet):
 3. Add any custom image transformation code your model requires to the `./model/data_transform_description.py` module.
 4. Test your model's inference using:
 ```bash
-python objectnet_eval.py /input out.csv my_model model/my_model.pth
+python objectnet_eval.py /input/images /output/predictions.csv my_model model/my_model.pth
 ```
-5. Ensure the output is in the format expected by the ObjectNet Challenge
-**##### link to format description**
+## 1.8 Validating the predictions
+In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
+```bash
+python validate_and_score.py -a input/answers/answers-test.json -f output/predictions.csv
+```
+Note the usage of the `-a` and `-f` flags as specified in `validate_and_score.py --help` below.
+```
+usage: validate_and_score.py [-h] --answers ANSWERS --filename FILENAME
+                             [--range_check]
 
+optional arguments:
+  -h, --help            show this help message and exit
+  --answers ANSWERS, -a ANSWERS
+                        ground truth/answer file
+  --filename FILENAME, -f FILENAME
+                        users result file
+  --range_check, -r     reject entries that have out-of-range label indices
+{
+  "prediction_file_errors": [
+    "Failed to parse command line"
+  ], 
+  "prediction_file_status": "INVALID"
+}
+```
+
+Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. 
+
+If you received an error in running this command ensure that you have entered the correct file locations for the answer file as well as the result file. For clarification on result file structure refer to **####AS Insert Synapse link to spec**.
 
 
 ---
@@ -157,19 +182,19 @@ python objectnet_eval.py /input out.csv my_model model/my_model.pth
 
 ## 2.1 Install NVIDIA drivers
 Prior to uploading the docker image to the competition portal for evaluation you should test your docker image locally. If your local machine has NVIDIA-capable GPUs and you wish to test inference using GPUs then you will first need to install the NVIDIA drivers on your machine. See
-section [1.2 Install NVIDIA drivers](1.2_Install_NVIDIA_drivers) above.
+section [1.2 Install NVIDIA drivers](#1.2-Install-NVIDIA-drivers) above.
 
 ## 2.2 Add your model & supporting code
-Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.7 Testing your own model with the example](1.7_Testing_your_own_model_with_the_example) for more details.
+Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.7 Testing your own model with the example](#1.7-Testing-your-own-model-with-the-example) for more details.
 
 **#####SH is the below his true**
 
 **Note:** Your model must have been saved using `torch.save(model, "<PATH TO SAVED MODEL FILE>")`.
 
 ## 2.3 Build the docker image
-Docker images are built from a series of statements contained in a `Dockerfile`. A template Dockerfile is provided for models built using the PyTorch (`Dockerfile`) deep learning framework and saved using the `torch.save` api.
+Docker images are built from a series of statements contained in a `Dockerfile`. A template Dockerfile is provided for models built using the PyTorch deep learning framework and saved using the `torch.save` api.
 
-The PyTorch docker image for the ObjectNet Challenge uses the [official PyTorch docker images](https://hub.docker.com/r/pytorch/pytorch/tags) as its base image. These PyTorch images come with built-in GPU support and with python 3 pre-loaded. By default, the docker image is built using [PyTorch version 1.4, cuda 10.1 and cudann7](https://hub.docker.com/layers/pytorch/pytorch/1.4-cuda10.1-cudnn7-runtime/images/sha256-ee783a4c0fccc7317c150450e84579544e171dd01a3f76cf2711262aced85bf7?context=explore).
+The PyTorch docker image template for the ObjectNet Challenge uses one of the [official PyTorch docker images](https://hub.docker.com/r/pytorch/pytorch/tags) as its base image. These PyTorch images come with built-in GPU support and with python 3 pre-loaded. By default, the docker image is built using [PyTorch version 1.4, cuda 10.1 and cudann7](https://hub.docker.com/layers/pytorch/pytorch/1.4-cuda10.1-cudnn7-runtime/images/sha256-ee783a4c0fccc7317c150450e84579544e171dd01a3f76cf2711262aced85bf7?context=explore).
 
 **#####SH - pointer to a tutorial on how to use the images**
 
@@ -199,7 +224,7 @@ You can further customise the build of you docker container by specifying the fo
 **Note:** The ObjectNet Challenge submission process is expecting the output to be directed to `\output\predictions.csv` file within the container image. Ensure the `output-file` argument to the `objectnet_eval.py` module of the ENTRYPOINT command in the `Dockerfile` file is set to `\output\predictions.csv`. For example:
 ```
 # Define the command to execute when the container is run
-ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH
+ENTRYPOINT python objectnet_eval.py /input/images /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH
 ```
 
 To build the docker image run:
@@ -218,29 +243,31 @@ Once the build is complete your newly built docker image can be listed using  th
 ```bash
 $ docker images
 ```
-
+Note that if the docker was built without version tagging it is given a default tag `latest`.
 ## 2.4 Testing the docker image locally
 Test the docker image locally before submitting it to the challenge. For example, if you tagged your docker image during the build step with `docker.synapse.org/syn12345/my-model:version1`, then from the root directory of this cloned repo issue:
 
-**#####SH ONLY works with GPUs at the moment - see below example**
-```bash
-docker run -ti --rm -v $PWD/sample-images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
-```
-The `-v $PWD/sample-images:/input` mounts a directory of test images from the local path into `/input` within the docker container. Similarly, `-v $PWD/output:/output` mounts an output directory from the local path into `/output` of the container.
-
-If your test host has GPUs and you built a GPU enabled docker image, then add the `--gpus=all` parameter to the `docker run` command in order to utilise your GPUs:
 ```bash
 docker run -ti --rm --gpus=all -v $PWD/sample-images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
 
+The `-v $PWD/input/images:/input` mounts a directory of test images from the local path into `/input` within the docker container. Similarly, `-v $PWD/output:/output` mounts an output directory from the local path into `/output` of the container. Add the `--gpus=all` parameter to the `docker run` command in order to utilise your GPUs.
+
 ## 2.5 Debugging your docker image locally
-If there are errors during Step 5 then you will need to debug your docker container.
+If there are errors during the previous step then you will need to debug your docker container.
 If you make changes to your code there is no need to rebuild the docker container. To quickly test your new code, simply mount the root path of this repo as a volume when you run the container. For example:
 ```bash
-docker run -ti --rm -v $PWD:/workspace -v $PWD/sample-images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
+docker run -ti --rm -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
 When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
 
+## 2.6 Validating the predictions
+In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
+```bash
+python validate_and_score.py -a input/answers/answers-test.json -f output/predictions.csv
+```
+
+Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#1.8-Validating-the-predictions) to handle any errors.
 
 ---
 

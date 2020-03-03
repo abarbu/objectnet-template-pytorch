@@ -45,7 +45,7 @@ args = parser.parse_args()
 
 # check the Args
 # images
-assert (os.path.exists(args.images)), "Path to images folder: "+args.images+", does not exist!"
+# assert (os.path.exists(args.images)), "Path to images folder: "+args.images+", does not exist!"
 # output file
 assert (not os.path.exists(args.output_file)), "Output file: "+args.output_file+", already exists!"
 assert (os.path.exists(os.path.dirname(args.output_file)) or os.path.dirname(args.output_file)==""), "Output file path: "+os.path.dirname(args.output_file)+", does not exist!"
