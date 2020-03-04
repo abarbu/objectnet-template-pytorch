@@ -148,7 +148,7 @@ python objectnet_eval.py /input/images /output/predictions.csv my_model model/my
 ## 1.8 Validating the predictions
 In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
 ```bash
-python validate_and_score.py -a input/answers/answers-test.json -f output/predictions.csv
+python validate_and_score.py -r -a input/answers/answers-test.json -f output/predictions.csv
 ```
 Note the usage of the `-a` and `-f` flags as specified in `validate_and_score.py --help` below.
 ```
@@ -264,7 +264,7 @@ When the docker container is run, the local `$PWD` will be mounted over `/worksp
 ## 2.6 Validating the predictions
 In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
 ```bash
-python validate_and_score.py -a input/answers/answers-test.json -f output/predictions.csv
+python validate_and_score.py -r -a input/answers/answers-test.json -f output/predictions.csv
 ```
 
 Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#1.8-Validating-the-predictions) to handle any errors.
