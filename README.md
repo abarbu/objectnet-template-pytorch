@@ -129,6 +129,42 @@ Results will be written to the `predictions.csv` file in the `/output` directory
 the output conforms to the format expected by the ObjectNet Challenge **##### link to
 format description**
 
+---
+
+### **Modifying the code to another existing model**
+
+Other existing PyTorch models can be used to test the process. For example, implementation of a pre-trained [InceptionV3 model](https://github.com/pytorch/vision/blob/master/torchvision/models/inception.py) is shown below:
+
+#### 1. Requirements
+
+This model uses the SciPy library. As this is not included in the default PyTorch Docker container it needs to be included in the `requirements.txt` file. Include it as follows:
+```bash
+# This file specifies python dependencies which are to be installed onto the Docker image
+# List one library per line (not as a comment)
+# e.g.
+#numpy
+scipy
+```
+Uncomment the following line in `Dockerfile`:
+```bash
+RUN pip install -r requirements.txt
+```
+#### 2. Model changes
+
+The only model changes should be in the `/model` directory.
+1. Download the model checkpoint file into `/model`:
+```bash
+wget https://download.pytorch.org/models/inception_v3_google-1a9a5a14.pth
+```
+2. Copy the `Inception3` class (along with any dependencies) from `inception.py` in the above link into `model_description.py`.
+3. Amend the following parameters in `data_transformation_description.py`:
+    - input_size = [3, 299, 299]
+    - mean = [0.5, 0.5, 0.5]
+    - std = [0.5, 0.5, 0.5]
+4. Run the inference as per above, i.e.
+```bash
+python objectnet_eval.py /input/images /output/predictions.csv Inception3 model/inception_v3_google-1a9a5a14.pth
+```
 ## 1.7 Testing your own model with the example
 To test the example with your own model:
 1. Copy your model checkpoint file into the `./model` directory.
@@ -141,7 +177,11 @@ class my_model(ResNet):
         super().__init__(Bottleneck, [3, 4, 23, 3], groups=32, width_per_group=16)
 ```
 3. Add any custom image transformation code your model requires to the `./model/data_transform_description.py` module.
-4. Test your model's inference using:
+4. If you have no extra Python dependencies skip to 5, otherwise ensure any Python dependencies are written to `requirements.txt` and uncomment the following line in `Dockerfile`:
+```bash
+RUN pip install -r requirements.txt
+```
+5. Test your model's inference using:
 ```bash
 python objectnet_eval.py /input/images /output/predictions.csv my_model model/my_model.pth
 ```
@@ -185,7 +225,7 @@ Prior to uploading the docker image to the competition portal for evaluation you
 section [1.2 Install NVIDIA drivers](#1.2-Install-NVIDIA-drivers) above.
 
 ## 2.2 Add your model & supporting code
-Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.7 Testing your own model with the example](#1.7-Testing-your-own-model-with-the-example) for more details.
+Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.7 Testing your own model with the example](#17-testing-your-own-model-with-the-example) for more details.
 
 **#####SH is the below his true**
 
@@ -248,7 +288,7 @@ Note that if the docker was built without version tagging it is given a default 
 Test the docker image locally before submitting it to the challenge. For example, if you tagged your docker image during the build step with `docker.synapse.org/syn12345/my-model:version1`, then from the root directory of this cloned repo issue:
 
 ```bash
-docker run -ti --rm --gpus=all -v $PWD/sample-images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
+docker run -ti --rm --gpus=all -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
 
 The `-v $PWD/input/images:/input` mounts a directory of test images from the local path into `/input` within the docker container. Similarly, `-v $PWD/output:/output` mounts an output directory from the local path into `/output` of the container. Add the `--gpus=all` parameter to the `docker run` command in order to utilise your GPUs.
@@ -257,7 +297,7 @@ The `-v $PWD/input/images:/input` mounts a directory of test images from the loc
 If there are errors during the previous step then you will need to debug your docker container.
 If you make changes to your code there is no need to rebuild the docker container. To quickly test your new code, simply mount the root path of this repo as a volume when you run the container. For example:
 ```bash
-docker run -ti --rm -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
+docker run -ti --rm --gpus=all -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
 When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
 
@@ -267,9 +307,9 @@ In order to ensure that the `predictions.csv` file is structured according to th
 python validate_and_score.py -r -a input/answers/answers-test.json -f output/predictions.csv
 ```
 
-Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#1.8-Validating-the-predictions) to handle any errors.
+Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#18-validating-the-predictions) to handle any errors.
 
 ---
 
 # Upload your docker image to Synapse:
-Once you have built and tested your docker image locally you should upload it to the [Synapse docker registry](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093) and then [submit your docker image to the challenge](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093). **#####SH Will need to update both these link**
+Once you have built and tested your docker image locally you should upload it to the [Synapse docker registry](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093) for submission.
