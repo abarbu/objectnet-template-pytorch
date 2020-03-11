@@ -1,0 +1,4 @@
+# This file specifies python dependencies which are to be installed onto the Docker image
+# List one library per line (not as a comment)
+# e.g.
+#numpy
