@@ -49,5 +49,8 @@ WORKDIR /workspace
 # image at /workspace
 COPY . /workspace
 
+# Uncomment the following line in order to install python dependencies defined in requirements.txt
+#RUN pip install -r requirements.txt
+
 # Define the command to execute when the container is run
 ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH 
