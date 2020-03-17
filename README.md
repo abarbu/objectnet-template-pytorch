@@ -1,7 +1,7 @@
 # Overview
-This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the ObjectNet Challenge (**#####SH Proper name for challenge and link to synapse wiki**). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
+This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the [ObjectNet Challenge](https://www.synapse.org/#!Synapse:syn21445379/wiki/). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
-If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided on the ObjectNet Challenge wiki page **#####SH Add link to wiki**
+If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided on the [ObjectNet Challenge wiki page](https://www.synapse.org/#!Synapse:syn21445379/wiki/).
 
 If you are not familiar with docker here are instructions on how to [install docker](https://docs.docker.com/install/), along with a [quick start guide](https://docs.docker.com/get-started/).
 
@@ -13,7 +13,7 @@ These instructions are split into two sections:
 
 # Section 1: ObjectNet competition eval model example code
 The following section provides example code and a
-baseline [model](https://github.com/facebookresearch/WSL-Images) for the ObjectNet competition (**#####SH Proper name for challenge**).
+baseline [model](https://github.com/facebookresearch/WSL-Images) for the ObjectNet Challenge.
 The code is structured such that most existing PyTorch models can
 be plugged into the example with minimal code changes necessary.
 
@@ -21,7 +21,7 @@ The example code uses batching and parallel data loading to improve inference
 efficiency.
 
 **Note:** If you are building your own customized docker image with your own
-code it is highly recommended to use similar optimized techniques to ensure
+code it is highly recommended to use similar optimized inferencing techniques to ensure
 your submission will complete within the time limit set by the challenge organisers.
 
 
@@ -33,14 +33,12 @@ into the Docker image when the image is built.
  - tqdm
  - pytorch 1.4
  - cuda 10.1
-**#####SH test on non gpu machine w/o cuda**
 
 ## 1.2 Install NVIDIA drivers
-If your local machine has NVIDIA-capable GPUs and you want to test your docker image  
-locally using these GPUs then you will need to ensure the NVIDIA drivers have been
+If your local machine has NVIDIA-capable GPUs and you want to test your docker image locally using these GPUs then you will need to ensure the NVIDIA drivers have been
 installed on your test machine.
 
-Instructions on how to install the CUDA toolkit and NVIDIA drivers can be found [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation). Be sure to match the versions of CUDA/NVIDIA installed with the version of PyTorch and CUDA used to build your docker image (see [Section 2: Building the docker image](#Section-2:-Building-the-docker-image)).
+Instructions on how to install the CUDA toolkit and NVIDIA drivers can be found [here](https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation). Be sure to match the versions of CUDA/NVIDIA installed with the version of PyTorch and CUDA used to build your docker image - see [Section 2: Building the docker image](#section-2-building-the-docker-image).
 
 ## 1.3 Clone this repository
 Clone this repo to a machine which has docker installed:
@@ -48,10 +46,10 @@ Clone this repo to a machine which has docker installed:
 git clone https://github.com/dmayo/objectnet_competition_demo.git
 ```
 
-## 1.4 objectnet_eval.py
+## 1.4 Running objectnet_eval.py
 `objectnet_eval.py` is the main entry point for running this example.
 Full help is available using `objectnet_eval.py --help`:
-```
+```bash
 usage: objectnet_eval.py [-h] [--workers N] [--gpus N] [--batch_size N]
                          [--softmax T/F] [--convert_outputs_mode N]
                          images-dir output-file model-class-name
@@ -83,7 +81,7 @@ optional arguments:
 ```
 
 ## 1.5 Code structure
-There follows a description of the code structure used for this example.
+There follows a description of the code structure used in this repo.
 
 *./objectnet_eval.py:*
 - loads the pre-trained model (defined in model-class-name & model-checkpoint file)
@@ -102,7 +100,7 @@ Inside of the model directory: (*This is the only code that you will have to mod
 *./model/model_description.py:*
 - pytorch model description class that can be built out of torchvision module blocks or can extend nn.Module to implement any neural net model
 - the current example model is a [resnext101_32x48d](https://github.com/facebookresearch/WSL-Images)
-- add your own model description class to this file. **#####SH do we need to explain what the numbers are**
+- add your own model description class to this file.
 
 *./model/data_transform_description.py:*
 - contains all the dataset preprocessing transformations except cropping out the 2px red pixel border
@@ -118,75 +116,60 @@ cd model
 wget https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth
 ```
 You must also place a set of test images into the folder specified by the `images-dir`
-argument ('/input' in the example below) to the `objectnet_eval.py` program.
+argument ('input/images' in the example below) to the `objectnet_eval.py` program.
 
 Then run `objectnet_eval.py` using the following arguments:
 ```bash
 # Perform batch inference:
-python objectnet_eval.py /input/images /output/predictions.csv resnext101_32x48d_wsl model/ig_resnext101_32x48-3e41cc8a.pth
+python objectnet_eval.py input/images output/predictions.csv resnext101_32x48d_wsl model/ig_resnext101_32x48-3e41cc8a.pth
 ```
-Results will be written to the `predictions.csv` file in the `/output` directory. Check
+Results will be written to the `predictions.csv` file in the `output/` directory. Check
 the output conforms to the format expected by the ObjectNet Challenge **##### link to
 format description**
 
----
+## 1.7 Modifying the code to use your own PyTorch model
 
-### **Modifying the code to another existing model**
+You can plugin your own existing existing PyTorch model into the test the process. As an example, the implementation of a pre-trained [InceptionV3 model](https://github.com/pytorch/vision/blob/master/torchvision/models/inception.py) is shown below:
 
-Other existing PyTorch models can be used to test the process. For example, implementation of a pre-trained [InceptionV3 model](https://github.com/pytorch/vision/blob/master/torchvision/models/inception.py) is shown below:
+#### 1.7.1 Requirements
 
-#### 1. Requirements
-
-This model uses the SciPy library. As this is not included in the default PyTorch Docker container it needs to be included in the `requirements.txt` file. Include it as follows:
+This model uses the SciPy library. As this is not included in the default PyTorch Docker container it needs to be listed in the `requirements.txt` file so that it is 'pip installed' when the docker image is built. Include it as follows:
 ```bash
-# This file specifies python dependencies which are to be installed onto the Docker image
+# This file specifies python dependencies which are to be installed into the Docker image.
 # List one library per line (not as a comment)
 # e.g.
 #numpy
 scipy
 ```
-Uncomment the following line in `Dockerfile`:
+Uncomment the following line in the `Dockerfile`:
 ```bash
 RUN pip install -r requirements.txt
 ```
-#### 2. Model changes
+#### 1.7.2 Model changes
 
-The only model changes should be in the `/model` directory.
-1. Download the model checkpoint file into `/model`:
+The only code changes necessary when incorporating your PyTorch model should be in the `model/` directory.
+1. Download your model checkpoint file into `model/`. For example:
 ```bash
 wget https://download.pytorch.org/models/inception_v3_google-1a9a5a14.pth
 ```
-2. Copy the `Inception3` class (along with any dependencies) from `inception.py` in the above link into `model_description.py`.
-3. Amend the following parameters in `data_transformation_description.py`:
-    - input_size = [3, 299, 299]
-    - mean = [0.5, 0.5, 0.5]
-    - std = [0.5, 0.5, 0.5]
-4. Run the inference as per above, i.e.
-```bash
-python objectnet_eval.py /input/images /output/predictions.csv Inception3 model/inception_v3_google-1a9a5a14.pth
-```
-## 1.7 Testing your own model with the example
-To test the example with your own model:
-1. Copy your model checkpoint file into the `./model` directory.
 2. Add your model description as a class to `./model/model_description.py`. The
 class name will be used as the `model-class-name` argument to `objectnet_eval.py`.
-For example, for a model which has 32 groups and width per-group of 16 we could add:
+For the inception_v3 model copy the `Inception3` class (along with any dependencies) from `inception.py` in the above link into `model_description.py`.
+3. Amend the following parameters in `data_transformation_description.py` to match
+those that your model was trained on:
 ```python
-class my_model(ResNet):
-    def __init__(self):
-        super().__init__(Bottleneck, [3, 4, 23, 3], groups=32, width_per_group=16)
+    input_size = [3, 299, 299]
+    mean = [0.5, 0.5, 0.5]
+    std = [0.5, 0.5, 0.5]
 ```
-3. Add any custom image transformation code your model requires to the `./model/data_transform_description.py` module.
-4. If you have no extra Python dependencies skip to 5, otherwise ensure any Python dependencies are written to `requirements.txt` and uncomment the following line in `Dockerfile`:
+4. Test your model's inference using:
 ```bash
-RUN pip install -r requirements.txt
+python objectnet_eval.py input/images output/predictions.csv Inception3 model/inception_v3_google-1a9a5a14.pth
 ```
-5. Test your model's inference using:
-```bash
-python objectnet_eval.py /input/images /output/predictions.csv my_model model/my_model.pth
-```
-## 1.8 Validating the predictions
-In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
+
+## 1.8 Validating the predictions of your model
+In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script.
+Once your model has successfully executed run the following command to validate your output:
 ```bash
 python validate_and_score.py -r -a input/answers/answers-test.json -f output/predictions.csv
 ```
@@ -194,7 +177,6 @@ Note the usage of the `-a` and `-f` flags as specified in `validate_and_score.py
 ```
 usage: validate_and_score.py [-h] --answers ANSWERS --filename FILENAME
                              [--range_check]
-
 optional arguments:
   -h, --help            show this help message and exit
   --answers ANSWERS, -a ANSWERS
@@ -205,12 +187,12 @@ optional arguments:
 {
   "prediction_file_errors": [
     "Failed to parse command line"
-  ], 
+  ],
   "prediction_file_status": "INVALID"
 }
 ```
 
-Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. 
+Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`.
 
 If you received an error in running this command ensure that you have entered the correct file locations for the answer file as well as the result file. For clarification on result file structure refer to **####AS Insert Synapse link to spec**.
 
@@ -218,14 +200,14 @@ If you received an error in running this command ensure that you have entered th
 ---
 
 
-# Section 2: Building the docker image
+# Section 2 Building the docker image
 
 ## 2.1 Install NVIDIA drivers
 Prior to uploading the docker image to the competition portal for evaluation you should test your docker image locally. If your local machine has NVIDIA-capable GPUs and you wish to test inference using GPUs then you will first need to install the NVIDIA drivers on your machine. See
-section [1.2 Install NVIDIA drivers](#1.2-Install-NVIDIA-drivers) above.
+section [1.2 Install NVIDIA drivers](#1%2E2-install-nvidia-drivers) above.
 
 ## 2.2 Add your model & supporting code
-Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.7 Testing your own model with the example](#17-testing-your-own-model-with-the-example) for more details.
+Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.8 Validating the predictions of your model](#1.8-validating-the-predictions-of-your-model) for more details.
 
 **#####SH is the below his true**
 
@@ -261,9 +243,10 @@ You can further customise the build of you docker container by specifying the fo
 
 **#####SH we probably don't want to publicise workers & batch size since this could in theory lead to a DoS attack**
 
-A bash script, `build-docker-submission.sh`, has been created to build the Docker image with the following inputs:
-```
-This command runs builds your model into a Docker Image
+A bash script, `build-docker-submission.sh`, has been created to build the Docker image
+for you. The script has the following inputs:
+```bash
+This command builds your model into a Docker Image
 Docker Image will be set to: docker.synapse.org/ID/REPO:TAG
 
 *Default*
@@ -289,15 +272,16 @@ where, for example
 - NAME = resnext101_32x48d_wsl
 - CHECKPOINT = model/ig_resnext101_32x48-3e41cc8a.pth
 
-**Note:** Please ensure you have no more than one checkpoint file in the `\model` directory when building the image. This will save space in the built Docker image.
+**Note:** Please ensure you have no more than one checkpoint file in the `model\` directory when building the image. This will save space in the built Docker image.
 
-Once the build is complete your newly built docker image can be listed using  the command:
+Once the build is complete your newly built docker image can be listed using the command:
 ```bash
 $ docker images
 ```
 For the above example the resultant image would be called `docker.synapse.org/syn12345/my-model:version1`.
 
-If the docker was built without version tagging it is given a default tag `latest`.
+If the docker was built without version tagging it is given a default tag of `latest`.
+
 ## 2.4 Testing the docker image locally
 Test the docker image locally before submitting it to the challenge. For example, a docker image called `docker.synapse.org/syn12345/my-model:version1` is run by:
 
@@ -313,7 +297,7 @@ If you make changes to your code there is no need to rebuild the docker containe
 ```bash
 docker run -ti --rm --gpus=all -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
 ```
-When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
+When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the docker image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
 
 ## 2.6 Validating the predictions
 In order to ensure that the `predictions.csv` file is structured according to the ObjectNet Challenge specifications, it is important to validate it against the `validate_and_score.py` script. Run the following command:
