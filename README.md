@@ -261,31 +261,45 @@ You can further customise the build of you docker container by specifying the fo
 
 **#####SH we probably don't want to publicise workers & batch size since this could in theory lead to a DoS attack**
 
-**Note:** The ObjectNet Challenge submission process is expecting the output to be directed to `\output\predictions.csv` file within the container image. Ensure the `output-file` argument to the `objectnet_eval.py` module of the ENTRYPOINT command in the `Dockerfile` file is set to `\output\predictions.csv`. For example:
+A bash script, `build-docker-submission.sh`, has been created to build the Docker image with the following inputs:
 ```
-# Define the command to execute when the container is run
-ENTRYPOINT python objectnet_eval.py /input/images /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH
-```
+This command runs builds your model into a Docker Image
+Docker Image will be set to: docker.synapse.org/ID/REPO:TAG
 
-To build the docker image run:
-```bash
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/<Your Synapse Project ID>/<Repo name>:<Tag> -f Dockerfile .
+*Default*
+NAME="resnext101_32x48d_wsl"
+CHECKPOINT="model/ig_resnext101_32x48-3e41cc8a.pth"
+
+options:
+-h, --help				            show brief help
+-n, --model-class-name=NAME		    specify a model class name to use
+-c, --model-checkpoint=CHECKPOINT	specify the path to a model checkpoint to use
+-p, --project-id=ID			        specify your Synapse Project ID
+-r, --repo=REPO			            specify your repo name
+-t, --tag=TAG			            specify your Docker image tag
 ```
-Replace \<Your Synapse Project ID> with the [ID of the Synapse project](https://docs.synapse.org/articles/getting_started.html#synapse-ids) you have registered with the Challenge.
-For example:
+Create your image by running:
 ```bash
-# With version tagging:
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model:version1 -f Dockerfile .
-# Or without version tagging:
-docker build --build-arg MODEL_CLASS_NAME="resnext101_32x48d_wsl" --build-arg MODEL_CHECKPOINT="ig_resnext101_32x48-3e41cc8a.pth" -t docker.synapse.org/syn12345/my-model -f Dockerfile .
+./build-docker-submission.sh -p ID -r REPO -t TAG -n NAME -c CHECKPOINT
 ```
+where, for example
+- ID = syn12345
+- REPO = my_model
+- TAG = version1
+- NAME = resnext101_32x48d_wsl
+- CHECKPOINT = model/ig_resnext101_32x48-3e41cc8a.pth
+
+**Note:** Please ensure you have no more than one checkpoint file in the `\model` directory when building the image. This will save space in the built Docker image.
+
 Once the build is complete your newly built docker image can be listed using  the command:
 ```bash
 $ docker images
 ```
-Note that if the docker was built without version tagging it is given a default tag `latest`.
+For the above example the resultant image would be called `docker.synapse.org/syn12345/my-model:version1`.
+
+If the docker was built without version tagging it is given a default tag `latest`.
 ## 2.4 Testing the docker image locally
-Test the docker image locally before submitting it to the challenge. For example, if you tagged your docker image during the build step with `docker.synapse.org/syn12345/my-model:version1`, then from the root directory of this cloned repo issue:
+Test the docker image locally before submitting it to the challenge. For example, a docker image called `docker.synapse.org/syn12345/my-model:version1` is run by:
 
 ```bash
 docker run -ti --rm --gpus=all -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
@@ -312,4 +326,4 @@ Proceed to the next section if you receive an output of `"prediction_file_status
 ---
 
 # Upload your docker image to Synapse:
-Once you have built and tested your docker image locally you should upload it to the [Synapse docker registry](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093) for submission.
+Once you have built and tested your docker image locally you should upload it to the [Synapse docker registry](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093) and then [submit your docker image to the challenge](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093). **#####SH Will need to update both these link**
