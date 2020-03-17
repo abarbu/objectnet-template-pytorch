@@ -113,12 +113,6 @@ if [ "$REPO" == "" ]; then
  exit 1
 fi
 
-if [ ! -f "$CHECKPOINT" ]; then
- echo "Error: Checkpoint file does not exist at path \"$CHECKPOINT\""
- echo ""
- exit 1
-fi
-
 echo ""
 echo "Using Arguments:"
 echo "Model Class Name = $NAME"
@@ -132,7 +126,7 @@ CHECKPOINT_FILE="${CHECKPOINT##*/}"
 if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
  # need to download the default checkpoint
  if [ ! -f "downloads/ig_resnext101_32x48-3e41cc8a.pth" ]; then
-  echo "Downloading default model checkpoint"
+  mkdir -p downloads
   cd downloads
   wget https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth
   cd ..
@@ -141,6 +135,12 @@ if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
  if [ ! -f "model/ig_resnext101_32x48-3e41cc8a.pth" ]; then
   cp downloads/ig_resnext101_32x48-3e41cc8a.pth model
  fi; else
+ # make sure checkpoint exists
+ if [ ! -f "$CHECKPOINT" ]; then
+  echo "Error: Checkpoint file does not exist at path \"$CHECKPOINT\""
+  echo ""
+  exit 1
+ fi
  # remove default checkpoint from model directory if not needed
  if [  -f "model/ig_resnext101_32x48-3e41cc8a.pth" ]; then
   rm model/ig_resnext101_32x48-3e41cc8a.pth
