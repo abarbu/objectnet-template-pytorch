@@ -1,7 +1,7 @@
 # Overview
 This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the [ObjectNet Challenge](https://www.synapse.org/#!Synapse:syn21445379/wiki/). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
-If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided on the [ObjectNet Challenge wiki page](https://www.synapse.org/#!Synapse:syn21445379/wiki/).
+If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided in section B of [Docker Image Creation](https://www.synapse.org/#!Synapse:syn21445379/wiki/601552).
 
 If you are not familiar with docker here are instructions on how to [install docker](https://docs.docker.com/install/), along with a [quick start guide](https://docs.docker.com/get-started/).
 
@@ -204,10 +204,10 @@ If you received an error in running this command ensure that you have entered th
 
 ## 2.1 Install NVIDIA drivers
 Prior to uploading the docker image to the competition portal for evaluation you should test your docker image locally. If your local machine has NVIDIA-capable GPUs and you wish to test inference using GPUs then you will first need to install the NVIDIA drivers on your machine. See
-section [1.2 Install NVIDIA drivers](#1%2E2-install-nvidia-drivers) above.
+section [1.2 Install NVIDIA drivers](#12-install-nvidia-drivers) above.
 
 ## 2.2 Add your model & supporting code
-Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.8 Validating the predictions of your model](#1.8-validating-the-predictions-of-your-model) for more details.
+Ensure you have been able to successfully test your model on the local host using the `objectnet_eval.py` example code - see section [1.8 Validating the predictions of your model](#18-validating-the-predictions-of-your-model) for more details.
 
 **#####SH is the below his true**
 
@@ -305,9 +305,9 @@ In order to ensure that the `predictions.csv` file is structured according to th
 python validate_and_score.py -r -a input/answers/answers-test.json -f output/predictions.csv
 ```
 
-Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#18-validating-the-predictions) to handle any errors.
+Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`. Otherwise, refer back to [1.8 Validating the predictions](#18-validating-the-predictions-of-your-model) to handle any errors.
 
 ---
 
 # Upload your docker image to Synapse:
-Once you have built and tested your docker image locally you should upload it to the [Synapse docker registry](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093) and then [submit your docker image to the challenge](https://www.synapse.org/#!Synapse:syn21445381/wiki/600093). **#####SH Will need to update both these link**
+Once you have built and tested your docker image locally, refer to [Model Submission](https://www.synapse.org/#!Synapse:syn21445379/wiki/601749) for instructions on uploading your image to the Synapse Docker registry and subsequent submission to the challenge.
