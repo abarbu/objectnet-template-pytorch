@@ -2,8 +2,7 @@
 
 NAME="resnext101_32x48d_wsl"
 CHECKPOINT="model/ig_resnext101_32x48-3e41cc8a.pth"
-ID=""
-REPO=""
+IMAGE=""
 TAG="latest"
 while test $# -gt 0; do
   case "$1" in
@@ -19,8 +18,7 @@ while test $# -gt 0; do
       echo "-h, --help				show brief help"
       echo "-n, --model-class-name=NAME		specify a model class name to use"
       echo "-c, --model-checkpoint=CHECKPOINT	specify the path to a model checkpoint to use"
-      echo "-p, --project-id=ID			specify your Synapse Project ID"
-      echo "-r, --repo=REPO			specify your repo name"
+      echo "-i, --image=IMAGE			specify your Docker image"
       echo "-t, --tag=TAG			specify your Docker image tag"
   exit 0
       ;;
@@ -52,32 +50,18 @@ while test $# -gt 0; do
       export NAME=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
-    -p)
+    -i)
       shift
       if test $# -gt 0; then
-        export ID=$1
+        export IMAGE=$1
       else
-        echo "no Synapse Project ID specified"
+        echo "no Docker image specified"
         exit 1
       fi
       shift
       ;;
-    --project-id*)
-      export ID=`echo $1 | sed -e 's/^[^=]*=//g'`
-      shift
-      ;;
-    -r)
-      shift
-      if test $# -gt 0; then
-        export REPO=$1
-      else
-        echo "no repo name specified"
-        exit 1
-      fi
-      shift
-      ;;
-    --repo)
-      export REPO=`echo $1 | sed -e 's/^[^=]*=//g'`
+    --image)
+      export IMAGE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
     -t)
@@ -101,14 +85,8 @@ while test $# -gt 0; do
 done
 
 # exit for errors
-if [ "$ID" == "" ]; then
- echo "Error: no Synapse Project ID specified"
- echo ""
- exit 1
-fi
-
-if [ "$REPO" == "" ]; then
- echo "Error: no repo name specified"
+if [ "$IMAGE" == "" ]; then
+ echo "Error: no Docker image specified"
  echo ""
  exit 1
 fi
@@ -117,7 +95,7 @@ echo ""
 echo "Using Arguments:"
 echo "Model Class Name = $NAME"
 echo "Model Checkpoint = $CHECKPOINT"
-echo "Docker Image: docker.synapse.org/$ID/$REPO:$TAG"
+echo "Docker Image: $IMAGE:$TAG"
 echo ""
 
 CHECKPOINT_FILE="${CHECKPOINT##*/}"
@@ -148,4 +126,4 @@ if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
  cp $CHECKPOINT model
 fi
 
-docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t docker.synapse.org/"$ID/$REPO:$TAG" -f Dockerfile .
+docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
