@@ -1,7 +1,7 @@
 # Overview
-This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the [ObjectNet Challenge](https://www.synapse.org/#!Synapse:syn21445379/wiki/). It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
+This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the [ObjectNet Challenge](https://www.synapse.org/#!Synapse:syn21445379/wiki/)**###AS Update to EvalAI**. It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
-If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided in section B of [Docker Image Creation](https://www.synapse.org/#!Synapse:syn21445379/wiki/601552).
+If your model is built using a different framework the docker template provided will require additional customisation, instructions for which are provided in section B of [Docker Image Creation](https://www.synapse.org/#!Synapse:syn21445379/wiki/601552)**###AS Update to EvalAI**.
 
 If you are not familiar with docker here are instructions on how to [install docker](https://docs.docker.com/install/), along with a [quick start guide](https://docs.docker.com/get-started/).
 
@@ -194,7 +194,7 @@ optional arguments:
 
 Proceed to the next section if you receive an output of `"prediction_file_status": "VALIDATED"`.
 
-If you received an error in running this command ensure that you have entered the correct file locations for the answer file as well as the result file. For clarification on result file structure refer to **####AS Insert Synapse link to spec**.
+If you received an error in running this command ensure that you have entered the correct file locations for the answer file as well as the result file. For clarification on result file structure refer to **####AS Insert link to spec**.
 
 
 ---
@@ -246,28 +246,26 @@ You can further customise the build of you docker container by specifying the fo
 A bash script, `build-docker-submission.sh`, has been created to build the Docker image
 for you. The script has the following inputs:
 ```bash
-This command builds your model into a Docker Image
-Docker Image will be set to: docker.synapse.org/ID/REPO:TAG
+This command runs builds your model into a Docker Image
+Docker Image will be set to IMAGE:TAG
 
-*Default*
+Default
 NAME="resnext101_32x48d_wsl"
 CHECKPOINT="model/ig_resnext101_32x48-3e41cc8a.pth"
 
 options:
--h, --help				            show brief help
--n, --model-class-name=NAME		    specify a model class name to use
+-h, --help			             	show brief help
+-n, --model-class-name=NAME	    	specify a model class name to use
 -c, --model-checkpoint=CHECKPOINT	specify the path to a model checkpoint to use
--p, --project-id=ID			        specify your Synapse Project ID
--r, --repo=REPO			            specify your repo name
--t, --tag=TAG			            specify your Docker image tag
+-i, --image=IMAGE		        	specify your Docker image
+-t, --tag=TAG                       specify your Docker image tag
 ```
 Create your image by running:
 ```bash
-./build-docker-submission.sh -p ID -r REPO -t TAG -n NAME -c CHECKPOINT
+./build-docker-submission.sh -i IMAGE -t TAG -n NAME -c CHECKPOINT
 ```
 where, for example
-- ID = syn12345
-- REPO = my_model
+- IMAGE = my_model
 - TAG = version1
 - NAME = resnext101_32x48d_wsl
 - CHECKPOINT = model/ig_resnext101_32x48-3e41cc8a.pth
@@ -278,15 +276,14 @@ Once the build is complete your newly built docker image can be listed using the
 ```bash
 $ docker images
 ```
-For the above example the resultant image would be called `docker.synapse.org/syn12345/my-model:version1`.
 
 If the docker was built without version tagging it is given a default tag of `latest`.
 
 ## 2.4 Testing the docker image locally
-Test the docker image locally before submitting it to the challenge. For example, a docker image called `docker.synapse.org/syn12345/my-model:version1` is run by:
+Test the docker image locally before submitting it to the challenge. For example, a docker image called `my-model:version1` is run by:
 
 ```bash
-docker run -ti --rm --gpus=all -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
+docker run -ti --rm --gpus=all -v $PWD/input/images:/input/ -v $PWD/output:/output my-model:version1
 ```
 
 The `-v $PWD/input/images:/input` mounts a directory of test images from the local path into `/input` within the docker container. Similarly, `-v $PWD/output:/output` mounts an output directory from the local path into `/output` of the container. Add the `--gpus=all` parameter to the `docker run` command in order to utilise your GPUs.
@@ -295,7 +292,7 @@ The `-v $PWD/input/images:/input` mounts a directory of test images from the loc
 If there are errors during the previous step then you will need to debug your docker container.
 If you make changes to your code there is no need to rebuild the docker container. To quickly test your new code, simply mount the root path of this repo as a volume when you run the container. For example:
 ```bash
-docker run -ti --rm --gpus=all -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output docker.synapse.org/syn12345/my-model:version1
+docker run -ti --rm --gpus=all -v $PWD:/workspace -v $PWD/input/images:/input/ -v $PWD/output:/output my-model:version1
 ```
 When the docker container is run, the local `$PWD` will be mounted over `/workspace` directory within the docker image which effectively means any code/model changes made since the last `docker build` command will be contained within the running container.
 
@@ -310,4 +307,4 @@ Proceed to the next section if you receive an output of `"prediction_file_status
 ---
 
 # Upload your docker image to Synapse:
-Once you have built and tested your docker image locally, refer to [Model Submission](https://www.synapse.org/#!Synapse:syn21445379/wiki/601749) for instructions on uploading your image to the Synapse Docker registry and subsequent submission to the challenge.
+Once you have built and tested your docker image locally, refer to [Model Submission](https://www.synapse.org/#!Synapse:syn21445379/wiki/601749)**###AS Update to EvalAI** for instructions on uploading your image to the Synapse Docker registry and subsequent submission to the challenge.

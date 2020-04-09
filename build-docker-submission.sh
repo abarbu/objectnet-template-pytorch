@@ -8,9 +8,9 @@ while test $# -gt 0; do
   case "$1" in
     -h|--help)
       echo "This command runs builds your model into a Docker Image"
-      echo "Docker Image will be set to: docker.synapse.org/ID/REPO:TAG"
+      echo "Docker Image will be set to IMAGE:TAG"
       echo ""
-      echo "*Default*"
+      echo -e "\e[3mDefault\e[0m"
       echo "NAME=\"resnext101_32x48d_wsl\""
       echo "CHECKPOINT=\"model/ig_resnext101_32x48-3e41cc8a.pth\""
       echo ""
