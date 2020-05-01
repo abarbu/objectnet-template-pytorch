@@ -33,14 +33,10 @@ LABEL description="Docker image for ObjectNet AI Challenge."
 
 ARG MODEL_CHECKPOINT
 ARG MODEL_CLASS_NAME
-ARG WORKERS=8
-ARG BATCH_SIZE=16
 ENV MODEL_CLASS_NAME ${MODEL_CLASS_NAME}
 ENV MODEL_PATH "/workspace/model/"${MODEL_CHECKPOINT}
-ENV WORKERS ${WORKERS}
-ENV BATCH_SIZE ${BATCH_SIZE}
 
-RUN echo "Using pre-built model: $MODEL_PATH with $WORKERS workers and a batch size of $BATCH_SIZE"
+RUN echo "Using pre-built model: $MODEL_PATH"
 
 # Set working directory# Add metadata
 WORKDIR /workspace
