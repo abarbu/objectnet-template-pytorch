@@ -1,3 +1,9 @@
+# Important!
+As this branch does not contain gpus, ensure the docker container is run with the following (i.e. no gpu tag):
+```bash
+docker run -ti --rm -v $PWD/input/images:/input/ -v $PWD/output:/output my-model:version1
+```
+
 # Overview
 This repository contains instructions on how to build a docker image using the PyTorch deep learning framework for the [ObjectNet Challenge](https://www.synapse.org/#!Synapse:syn21445379/wiki/)**###AS Update to EvalAI**. It assumes you already have a pre-trained PyTorch model which you intend to submit for evaluation to the ObjectNet Challenge.
 
