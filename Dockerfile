@@ -49,4 +49,4 @@ COPY . /workspace
 #RUN pip install -r requirements.txt
 
 # Define the command to execute when the container is run
-ENTRYPOINT python objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH 
+ENTRYPOINT python cpu_objectnet_eval.py /input /output/predictions.csv $MODEL_CLASS_NAME $MODEL_PATH 
