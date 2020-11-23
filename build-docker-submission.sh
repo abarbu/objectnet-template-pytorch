@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-NAME="resnext101_32x48d_wsl"
-CHECKPOINT="model/ig_resnext101_32x48-3e41cc8a.pth"
+NAME=""
+CHECKPOINT=""
 IMAGE=""
 TAG="latest"
+CACHE=true
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
@@ -11,8 +12,7 @@ while test $# -gt 0; do
       echo "Docker Image will be set to IMAGE:TAG"
       echo ""
       echo -e "\e[3mDefault\e[0m"
-      echo "NAME=\"resnext101_32x48d_wsl\""
-      echo "CHECKPOINT=\"model/ig_resnext101_32x48-3e41cc8a.pth\""
+      echo "TAG=\"latest\""
       echo ""
       echo "options:"
       echo "-h, --help				show brief help"
@@ -20,14 +20,15 @@ while test $# -gt 0; do
       echo "-c, --model-checkpoint=CHECKPOINT	specify the path to a model checkpoint to use"
       echo "-i, --image=IMAGE			specify your Docker image"
       echo "-t, --tag=TAG			specify your Docker image tag"
-  exit 0
+      echo "-nc, --no-cache			bypass cache for docker build"
+      exit 0
       ;;
     -c)
       shift
       if test $# -gt 0; then
         export CHECKPOINT=$1
       else
-        echo "no model checkpoint specified"
+        echo "Error: no model checkpoint specified"
         exit 1
       fi
       shift
@@ -41,7 +42,7 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export NAME=$1
       else
-        echo "no model class name specified"
+        echo "Error: no model class name specified"
         exit 1
       fi
       shift
@@ -55,12 +56,12 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export IMAGE=$1
       else
-        echo "no Docker image specified"
+        echo "Error: no Docker image specified"
         exit 1
       fi
       shift
       ;;
-    --image)
+    --image*)
       export IMAGE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
@@ -69,7 +70,7 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export TAG=$1
       else
-        echo "no Docker image tag specified"
+        echo "Error: no Docker image tag specified"
         exit 1
       fi
       shift
@@ -78,8 +79,13 @@ while test $# -gt 0; do
       export TAG=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
+    --no-cache | -nc)
+      export CACHE=false
+      shift
+      ;;
     *)
-      break
+      echo "Error: flag $1 does not exist"
+      exit 1
       ;;
   esac
 done
@@ -90,19 +96,35 @@ if [ "$IMAGE" == "" ]; then
  echo ""
  exit 1
 fi
+if [ "$NAME" == "" ]; then
+ echo "Error: no model class name specified"
+ echo ""
+ exit 1
+fi
+if [ "$CHECKPOINT" == "" ]; then
+ echo "Error: no model checkpoint file path specified"
+ echo ""
+ exit 1
+fi
+if [ ! -f "$CHECKPOINT" ]; then
+ echo "Error: checkpoint file does not exist at path \"$CHECKPOINT\""
+ echo ""
+ exit 1
+fi
 
 echo ""
 echo "Using Arguments:"
 echo "Model Class Name = $NAME"
 echo "Model Checkpoint = $CHECKPOINT"
 echo "Docker Image: $IMAGE:$TAG"
+echo "Cache: $CACHE"
 echo ""
 
 CHECKPOINT_FILE="${CHECKPOINT##*/}"
 
-# check whether we're using the default model
+# check whether we're using the sample model
 if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
- # need to download the default checkpoint
+ # need to download the sample checkpoint
  if [ ! -f "downloads/ig_resnext101_32x48-3e41cc8a.pth" ]; then
   mkdir -p downloads
   cd downloads
@@ -119,11 +141,16 @@ if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
   echo ""
   exit 1
  fi
- # remove default checkpoint from model directory if not needed
+ # remove sample checkpoint from model directory if not needed
  if [  -f "model/ig_resnext101_32x48-3e41cc8a.pth" ]; then
   rm model/ig_resnext101_32x48-3e41cc8a.pth
  fi
  cp $CHECKPOINT model
 fi
 
-docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
+if [ "$CACHE" == true ]; then
+ docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
+else
+ docker build --no-cache --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
+fi
+
