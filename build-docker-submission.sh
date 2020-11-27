@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ "$0" != "./build-docker-submission.sh" ] && [ "$0" != "build-docker-submission.sh" ]; then
+  echo -e "\nError: $0" >&2
+  echo "This script must be run from the base folder of this repo" >&2
+  exit 1
+fi
+ 
 NAME=""
 CHECKPOINT=""
 IMAGE=""
@@ -119,34 +125,6 @@ echo "Model Checkpoint = $CHECKPOINT"
 echo "Docker Image: $IMAGE:$TAG"
 echo "Cache: $CACHE"
 echo ""
-
-CHECKPOINT_FILE="${CHECKPOINT##*/}"
-
-# check whether we're using the sample model
-if  [ "$CHECKPOINT_FILE" == "ig_resnext101_32x48-3e41cc8a.pth" ]; then
- # need to download the sample checkpoint
- if [ ! -f "downloads/ig_resnext101_32x48-3e41cc8a.pth" ]; then
-  mkdir -p downloads
-  cd downloads
-  wget https://download.pytorch.org/models/ig_resnext101_32x48-3e41cc8a.pth
-  cd ..
- fi
- # add the checkpoint to the model directory if necessary
- if [ ! -f "model/ig_resnext101_32x48-3e41cc8a.pth" ]; then
-  cp downloads/ig_resnext101_32x48-3e41cc8a.pth model
- fi; else
- # make sure checkpoint exists
- if [ ! -f "$CHECKPOINT" ]; then
-  echo "Error: Checkpoint file does not exist at path \"$CHECKPOINT\""
-  echo ""
-  exit 1
- fi
- # remove sample checkpoint from model directory if not needed
- if [  -f "model/ig_resnext101_32x48-3e41cc8a.pth" ]; then
-  rm model/ig_resnext101_32x48-3e41cc8a.pth
- fi
- cp $CHECKPOINT model
-fi
 
 if [ "$CACHE" == true ]; then
  docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
