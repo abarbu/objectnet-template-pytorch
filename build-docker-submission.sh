@@ -126,6 +126,7 @@ echo "Docker Image: $IMAGE:$TAG"
 echo "Cache: $CACHE"
 echo ""
 
+CHECKPOINT_FILE="${CHECKPOINT##*/}"
 if [ "$CACHE" == true ]; then
  docker build --build-arg MODEL_CLASS_NAME="$NAME" --build-arg MODEL_CHECKPOINT="$CHECKPOINT_FILE" -t "$IMAGE:$TAG" -f Dockerfile .
 else
