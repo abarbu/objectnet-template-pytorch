@@ -15,16 +15,11 @@
 #
 
 # Build based on the official PyTorch docker image available on docker hub:
-#   https://hub.docker.com/r/pytorch/pytorch/tags
-#   
-# You can select from the following pre-built PyTorch Docker images.
-# Select the image which most closely matches the
+# https://hub.docker.com/r/pytorch/pytorch/tags
+# Select an image from the website which most closely matches the
 # versions used to build your model.
-FROM pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
-#FROM pytorch/pytorch:1.3-cuda10.1-cudnn7-runtime
-#FROM pytorch/pytorch:1.2-cuda10.0-cudnn7-runtime
-#FROM pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-runtime
-#FROM pytorch/pytorch:1.0-cuda10.0-cudnn7-runtime
+# Here we're using PyTorch 1.7.0 with CUDA 11.0
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime
 
 # Add metadata
 LABEL maintainer="siharris@au1.ibm.com"
