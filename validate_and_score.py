@@ -22,8 +22,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--answers', '-a', required=True, help='ground truth/answer file')
     parser.add_argument('--filename', '-f', required=True, help='users result file')
-    parser.add_argument('--range_check', '-r', action='store_true', help='reject entries that have out-of-range label indices')
-
+    parser.add_argument('--no-range-check', '-n', action='store_true', help='allow entries that have out-of-range label indices')
     try:
         args = parser.parse_args()
     except:
@@ -74,7 +73,7 @@ if __name__ == '__main__':
                 # not really happy about swallowing exception, how to dump it w/o the submitter seeing it??
                 # print(e, file=sys.stderr)
                 err_exit('Failure to convert predictions to integer indices')
-            if args.range_check:
+            if not args.no_range_check:
                 for p in pred:
                     if p < range_min or p > range_max:
                         err_exit('Prediction index <{}> out of range [{}, {}]'.format(p, range_min, range_max))
