@@ -19,7 +19,8 @@
 # Select an image from the website which most closely matches the
 # versions used to build your model.
 # Here we're using PyTorch 1.7.0 with CUDA 11.0
-FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime
+#FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
 # Add metadata
 LABEL maintainer="siharris@au1.ibm.com"
