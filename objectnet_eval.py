@@ -21,13 +21,13 @@ from data_transform_description import data_transform
 torch.multiprocessing.set_sharing_strategy('file_system')
 
 parser = argparse.ArgumentParser(description='Evaluate a PyTorch model on ObjectNet images and output predictions to a CSV file.')
-parser.add_argument('images', metavar='images-dir',
+parser.add_argument('images',nargs='?', default='input/images',metavar='images-dir',
                     help='path to dataset')
-parser.add_argument('output_file', metavar='output-file',
+parser.add_argument('output_file',nargs='?', default='output/predictions.csv' ,metavar='output-file',
                     help='path to predictions output file')
-parser.add_argument('model_class_name', metavar='model-class-name',
+parser.add_argument('model_class_name', nargs='?',default='resnext101_32x48d_wsl',metavar='model-class-name',
                     help='model class name in model_description.py')
-parser.add_argument('model_checkpoint', metavar='model-checkpoint',
+parser.add_argument('model_checkpoint', nargs='?', default='model/ig_resnext101_32x48-3e41cc8a.pth', metavar='model-checkpoint',
                     help='path to model checkpoint')
 parser.add_argument('--workers', default=multiprocessing.cpu_count(), type=int, metavar='N',
                     help='number of data loading workers (default: total num CPUs)')
@@ -42,6 +42,7 @@ parser.add_argument('--softmax', default=True, type=bool, metavar='T/F',
 parser.add_argument('--convert_outputs_mode', default=1, type=int, metavar='N',
                     help="0: no conversion of prediction IDs, 1: convert from pytorch ImageNet prediction IDs to ObjectNet prediction IDs (default:1)")
 args = parser.parse_args()
+
 
 # check the Args
 # images
